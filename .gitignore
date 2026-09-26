@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+results/
+*.log
+.spyproject/
+~$*.xlsx
+local_only/
+.vscode/
