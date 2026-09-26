@@ -1331,6 +1331,19 @@ def build_model_v2(inst: Instance, *, primary: str, constraint: str,
                                            + inst.M25 * (1 - x[i, j, k, r]),
                             name=f"c25[{i},{j},{k},{r}]",
                         )
+    # (26) Capacity: on-board load never exceeds vehicle capacity
+    for j in inst.N:
+        for k in inst.K:
+            for r in inst.routes_of(k):
+                m.addConstr(y[j, k, r] <= inst.q_k[k], name=f"c26[{j},{k},{r}]")
+    # (27) Depot anchor (depot-as-customer): load leaving h equals depot-origin pickups
+    for k in inst.K:
+        for r in inst.routes_of(k):
+            m.addConstr(
+                y["h", k, r] == quicksum(inst.q_p[p] * f[p, k, r]
+                                         for p in inst.P if inst.o[p] == "h"),
+                name=f"c27[{k},{r}]",
+            )
     # (28) Route monotonicity
     for k in inst.K:
         for r in inst.routes_of(k)[:-1]:
